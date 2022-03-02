@@ -15,12 +15,24 @@ countryList = ct.GetCountryList()
 
 print(countryList)
 
+
+def getCountryVisaRequirements(countryList):
+    countryRequirementsResultList = []
+    for country in countryList:
+        payLoad = {"citizenship": country}
+        countryRequirementsResult = requests.get('https://visanotrequired.com/ein/visa-requirements', params=payLoad)
+        countryRequirementsResultList.extend(countryRequirementsResult.json()["result"])
+    return countryRequirementsResultList
+
+
+countryRequirementsResultList = getCountryVisaRequirements(countryList)
+
 countryRequirementSet = set()
 for countryRequirement in countryRequirementsResultList:
     # print(countryRequirement)
     countryRequirementSet.add(countryRequirement["Visa"].lower())
 
-#print(countryRequirementSet)
+# print(countryRequirementSet)
 
 engine = create_engine(data_url)
 
@@ -30,10 +42,10 @@ def visadataframe(set):
     for index, visas in enumerate(set):
         visasdic = {'name': visas, 'id': index + 1}
         visaDicList.append(visasdic)
-        #print(visaDicList)
+        # print(visaDicList)
     return pd.DataFrame(visaDicList)
 
 
-visa=visadataframe(countryRequirementSet)
+visa = visadataframe(countryRequirementSet)
 
 visa.to_sql('visas', engine, if_exists='replace', index=False)

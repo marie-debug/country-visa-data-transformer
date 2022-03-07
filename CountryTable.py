@@ -5,31 +5,31 @@ from sqlalchemy import create_engine
 
 class CountryTable:
     def __init__(self, data_url):
-        self.countryList = None
+        self.countryDicList = []
         self.data_url = data_url
+        self.countryDic = {}
         self.__initialize()
 
     def __initialize(self):
         try:
-            self.__setCountryList()
-            dataframe=self.__getCountryDataFrame()
+            self.__setCountryData()
             engine = create_engine(self.data_url)
+            dataframe = pd.DataFrame(self.countryDicList)
             dataframe.to_sql('countries', engine, if_exists='replace', index=False)
         except Exception as error:
             print('country table class initialization failed :' + str(error))
 
-    def __setCountryList(self):
+    def __getCountryList(self):
         countryListResponse = requests.get('https://visanotrequired.com/ein/countrys')
-        self.countryList = countryListResponse.json()["result"]
+        return countryListResponse.json()["result"]
 
-    def __getCountryDataFrame(self):
-        countryDicList = []
-        for index, country in enumerate(self.countryList):
-            countrydic = {'name': country, 'id': index + 1}
-            countryDicList.append(countrydic)
-        dataframe = pd.DataFrame(countryDicList)
-        return dataframe
+    def __setCountryData(self):
+        countryList = self.__getCountryList()
+        for index, country in enumerate(countryList):
+            id=index + 1
+            countrydic = {'name': country, 'id':id}
+            self.countryDic[country] = id
+            self.countryDicList.append(countrydic)
 
-
-    def GetCountryList(self):
-        return self.countryList
+    def GetCountryDic(self):
+        return self.countryDic

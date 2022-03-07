@@ -6,11 +6,14 @@ class VisaStatusTable:
     def __init__(self, data_url, countryRequirementsResultList):
         self.data_url = data_url
         self.countryRequirementsResultList = countryRequirementsResultList
+        self.visaDicList = []
+        self.visaStatusDic = {}
         self.__initialize()
 
     def __initialize(self):
         try:
-            dataframe = self.__getCountryVisaDataFrame()
+            self.__setCountryVisaData()
+            dataframe = pd.DataFrame(self.visaDicList)
             engine = create_engine(self.data_url)
             dataframe.to_sql('visaStatus', engine, if_exists='replace', index=False)
         except Exception as error:
@@ -23,12 +26,13 @@ class VisaStatusTable:
             countryRequirementSet.add(countryRequirement["Visa"].lower())
         return countryRequirementSet
 
-    def __getCountryVisaDataFrame(self):
-        visaDicList = []
+    def __setCountryVisaData(self):
         countryRequirementSet = self.__getCountryRequirementSet()
-        for index, visas in enumerate(countryRequirementSet):
-            visasdic = {'name': visas, 'id': index + 1}
-            visaDicList.append(visasdic)
-            # print(visaDicList)
-        dataframe = pd.DataFrame(visaDicList)
-        return dataframe
+        for index, visaStatus in enumerate(countryRequirementSet):
+            id=index+1
+            visasdic = {'name': visaStatus, 'id': id}
+            self.visaStatusDic[visaStatus]=id
+            self.visaDicList.append(visasdic)
+
+    def GetCountryVisaDic(self):
+        return self.visaStatusDic

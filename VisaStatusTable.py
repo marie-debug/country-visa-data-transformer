@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 import pandas as pd
+import testdata
 
 
 class VisaStatusTable:
@@ -8,6 +9,7 @@ class VisaStatusTable:
         self.countryRequirementsResultList = countryRequirementsResultList
         self.visaDicList = []
         self.visaStatusDic = {}
+        # self.visaStatusDic=testdata.visaStatusDic
         self.__initialize()
 
     def __initialize(self):
@@ -29,10 +31,17 @@ class VisaStatusTable:
     def __setCountryVisaData(self):
         countryRequirementSet = self.__getCountryRequirementSet()
         for index, visaStatus in enumerate(countryRequirementSet):
-            id=index+1
+            id = index + 1
             visasdic = {'name': visaStatus, 'id': id}
-            self.visaStatusDic[visaStatus]=id
+            self.visaStatusDic[visaStatus] = id
             self.visaDicList.append(visasdic)
 
     def GetCountryVisaDic(self):
         return self.visaStatusDic
+
+    def visaStatusToId(self, visaStatus):
+        visaStatus = visaStatus.lower()
+        if visaStatus in self.visaStatusDic:
+            return self.visaStatusDic[visaStatus]
+        else:
+            return None

@@ -17,9 +17,9 @@ class VisaStatusTable:
             self.__setCountryVisaData()
             dataframe = pd.DataFrame(self.visaDicList)
             engine = create_engine(self.data_url)
-            dataframe.to_sql('visaStatus', engine, if_exists='replace', index=False)
+            dataframe.to_sql('visa_status', engine, if_exists='replace', index=False)
         except Exception as error:
-            print('visaStatus table class initialization failed :' + str(error))
+            print('visa_status table class initialization failed :' + str(error))
 
     def __getCountryRequirementSet(self):
         countryRequirementSet = set()

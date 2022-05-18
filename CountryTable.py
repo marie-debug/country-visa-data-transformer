@@ -9,7 +9,7 @@ class CountryTable:
         self.countryDicList = []
         self.data_url = data_url
         self.countryDic = {}
-        # self.countryDic=testdata.countryList
+        #self.countryDic=testdata.countryList
         self.demonymsDic = pd.read_csv('country_demonyms.csv', header=None, index_col=0, squeeze=True).to_dict()
         self.__initialize()
 

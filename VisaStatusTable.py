@@ -9,7 +9,7 @@ class VisaStatusTable:
         self.countryRequirementsResultList = countryRequirementsResultList
         self.visaDicList = []
         self.visaStatusDic = {}
-        # self.visaStatusDic=testdata.visaStatusDic
+        #self.visaStatusDic=testdata.visaStatusDic
         self.__initialize()
 
     def __initialize(self):

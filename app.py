@@ -1,5 +1,5 @@
+import grequests
 import json
-import requests
 from CountryTable import CountryTable
 from VisaStatusTable import VisaStatusTable
 from CountryRequirementsTable import CountryRequirementsTable
@@ -10,18 +10,24 @@ from flask import Flask, send_file, jsonify
 import pandas as pd
 import os
 
+
 app = Flask(__name__)
 
 
-def getCountryVisaRequirements(CountryDic):
-    """Takes a dictionary countrydic, returns a list countryRequirementsResultList"""
-    # return testdata.country_requirements_result_list
-    countryRequirementsResultList = []
+def generateUrls(CountryDic):
+    urls = []
     for country in CountryDic:
-        payLoad = {"citizenship": country}
-        countryRequirementsResult = requests.get('https://visanotrequired.com/ein/visa-requirements', params=payLoad)
-        countryRequirementsResultList.extend(countryRequirementsResult.json()["result"])
-    return countryRequirementsResultList
+        url = 'https://visanotrequired.com/ein/visa-requirements?citizenship={}'.format(country)
+        urls.append(url)
+    return urls
+
+
+def getCountryVisaRequirements(urls):
+    reqs = [grequests.get(link) for link in urls]
+    resp = grequests.map(reqs)
+    return resp
+
+
 
 
 def create_view_table(data_url):
@@ -55,7 +61,7 @@ def getdatabaseUrl():
     # heroku generates a database url with 'postgres'
     # sqlalchemy requires the database url to start with 'postgresql'
     data_url = os.getenv('DATABASE_URL')
-    return data_url.replace("postgres", "postgresql")
+    return data_url.replace("postgres://", "postgresql://", 1)
 
 
 # creates table in psql when url is hit#
@@ -72,8 +78,12 @@ def create_tables():
     engine.execute(drop_view)
 
     ct = CountryTable(data_url)
+    urls = generateUrls(ct.GetCountryDic())
+    responses = getCountryVisaRequirements(urls)
 
-    countryRequirementsResultList = getCountryVisaRequirements(ct.GetCountryDic())
+    countryRequirementsResultList = []
+    for response in responses:
+        countryRequirementsResultList.extend(response.json()["result"])
 
     StatusTable = VisaStatusTable(data_url, countryRequirementsResultList)
 

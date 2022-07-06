@@ -1,14 +1,12 @@
 import json
 import requests
-import os
-from dotenv import load_dotenv
 from CountryTable import CountryTable
 from VisaStatusTable import VisaStatusTable
 from CountryRequirementsTable import CountryRequirementsTable
 from sqlalchemy import Table, MetaData, create_engine
 from sqlalchemy.sql import text
 from sqlalchemy_views import CreateView, DropView, metadata
-from flask import Flask, send_from_directory, send_file, jsonify
+from flask import Flask, send_file, jsonify
 import pandas as pd
 import os
 
@@ -16,6 +14,7 @@ app = Flask(__name__)
 
 
 def getCountryVisaRequirements(CountryDic):
+    """Takes a dictionary countrydic, returns a list countryRequirementsResultList"""
     # return testdata.country_requirements_result_list
     countryRequirementsResultList = []
     for country in CountryDic:
@@ -26,6 +25,7 @@ def getCountryVisaRequirements(CountryDic):
 
 
 def create_view_table(data_url):
+    """Takes data_url, creates and returns a view table """
     metadata = MetaData()
     view = Table('country_visa', metadata)
 
@@ -51,9 +51,12 @@ def create_view_table(data_url):
     return create_view
 
 
+# creates table in psql when url is hit#
+
 @app.route("/create-tables")
 def create_tables():
-    load_dotenv()
+    """creates tables in psql """
+
     data_url = os.getenv('DATABASE_URL')
     metadata = MetaData()
     view = Table('country_visa', metadata)
@@ -73,9 +76,12 @@ def create_tables():
     return "okay"
 
 
+# converts view table to csv when url is hit and stores it to static#
+
 @app.route("/csv")
 def view_table_to_csv():
-    load_dotenv()
+    """converts view table to csv """
+
     data_url = os.getenv('DATABASE_URL')
     conn = create_engine(data_url)
     df = pd.read_sql_query("SELECT * FROM country_visa", conn)
@@ -90,9 +96,11 @@ def view_table_to_csv():
     return send_file(filename, cache_timeout=0)
 
 
+# converts view table to json when url is hit#
 @app.route("/json")
 def view_table_to_json():
-    load_dotenv()
+    """converts view table to json """
+
     data_url = os.getenv('DATABASE_URL')
     conn = create_engine(data_url)
     df = pd.read_sql_query("SELECT * FROM country_visa", conn)

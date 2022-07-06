@@ -12,7 +12,9 @@ class CountryRequirementsTable:
         self.visa_status_table = visa_status_table
         self.__initialize()
 
+    # adds data into database#
     def __initialize(self):
+        """creates countries_requirements table in psql"""
         try:
             self.__setCountryRequirementsData()
             requirementDataframe = pd.DataFrame(self.requirementDicList)
@@ -20,6 +22,9 @@ class CountryRequirementsTable:
             requirementDataframe.to_sql('countries_requirements', engine, if_exists='replace', index=False)
         except Exception as error:
             print('countries_requirements table class initialization failed :' + str(error))
+
+    # loops through country_requirement_result_list and sets countryRequirementsData i.e DestinationCountry,
+    # VisitorCountry and VisaStatus and appends them to requirementDicList#
 
     def __setCountryRequirementsData(self):
         for requirement in self.country_requirements_result_list:

@@ -9,10 +9,12 @@ class VisaStatusTable:
         self.countryRequirementsResultList = countryRequirementsResultList
         self.visaDicList = []
         self.visaStatusDic = {}
-        #self.visaStatusDic=testdata.visaStatusDic
+        # self.visaStatusDic=testdata.visaStatusDic
         self.__initialize()
 
+    # connects to psql and adds data into database#
     def __initialize(self):
+        """creates visa status table in psql"""
         try:
             self.__setCountryVisaData()
             dataframe = pd.DataFrame(self.visaDicList)
@@ -21,6 +23,7 @@ class VisaStatusTable:
         except Exception as error:
             print('visa_status table class initialization failed :' + str(error))
 
+    # converts countryRequirementsResultList into set#
     def __getCountryRequirementSet(self):
         countryRequirementSet = set()
         for countryRequirement in self.countryRequirementsResultList:
@@ -28,6 +31,7 @@ class VisaStatusTable:
             countryRequirementSet.add(countryRequirement["Visa"].lower())
         return countryRequirementSet
 
+    # sets visaStatusDic and visaDiclist#
     def __setCountryVisaData(self):
         countryRequirementSet = self.__getCountryRequirementSet()
         for index, visaStatus in enumerate(countryRequirementSet):
@@ -37,9 +41,11 @@ class VisaStatusTable:
             self.visaDicList.append(visasdic)
 
     def GetCountryVisaDic(self):
+        """returns visaStatusDic"""
         return self.visaStatusDic
 
     def visaStatusToId(self, visaStatus):
+        """Takes visaStatus checks if it exists in visaStatusDic if it doesn't it returns none"""
         visaStatus = visaStatus.lower()
         if visaStatus in self.visaStatusDic:
             return self.visaStatusDic[visaStatus]

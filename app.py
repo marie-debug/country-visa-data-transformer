@@ -58,6 +58,11 @@ def create_tables():
     """creates tables in psql """
 
     data_url = os.getenv('DATABASE_URL')
+
+    # heroku generates a database url with 'postgres'
+    # sqlalchemy requires the database url to start with 'postgresql'
+    data_url.replace("postgres", "postgresql")
+
     metadata = MetaData()
     view = Table('country_visa', metadata)
 

@@ -51,18 +51,19 @@ def create_view_table(data_url):
     return create_view
 
 
+def getdatabaseUrl():
+    # heroku generates a database url with 'postgres'
+    # sqlalchemy requires the database url to start with 'postgresql'
+    data_url = os.getenv('DATABASE_URL')
+    return data_url.replace("postgres", "postgresql")
+
+
 # creates table in psql when url is hit#
 
 @app.route("/create-tables")
 def create_tables():
     """creates tables in psql """
-
-    data_url = os.getenv('DATABASE_URL')
-
-    # heroku generates a database url with 'postgres'
-    # sqlalchemy requires the database url to start with 'postgresql'
-    data_url.replace("postgres", "postgresql")
-
+    data_url = getdatabaseUrl()
     metadata = MetaData()
     view = Table('country_visa', metadata)
 
@@ -87,7 +88,7 @@ def create_tables():
 def view_table_to_csv():
     """converts view table to csv """
 
-    data_url = os.getenv('DATABASE_URL')
+    data_url = getdatabaseUrl()
     conn = create_engine(data_url)
     df = pd.read_sql_query("SELECT * FROM country_visa", conn)
 
@@ -106,7 +107,7 @@ def view_table_to_csv():
 def view_table_to_json():
     """converts view table to json """
 
-    data_url = os.getenv('DATABASE_URL')
+    data_url = getdatabaseUrl()
     conn = create_engine(data_url)
     df = pd.read_sql_query("SELECT * FROM country_visa", conn)
 

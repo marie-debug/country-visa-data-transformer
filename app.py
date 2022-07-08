@@ -28,8 +28,6 @@ def getCountryVisaRequirements(urls):
     return resp
 
 
-
-
 def create_view_table(data_url):
     """Takes data_url, creates and returns a view table """
     metadata = MetaData()
@@ -108,7 +106,7 @@ def view_table_to_csv():
     filename = path + "data.csv"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w") as f:
-        f.write(df.to_csv())
+        f.write(df.to_csv(index=False))
     return send_file(filename, cache_timeout=0)
 
 
